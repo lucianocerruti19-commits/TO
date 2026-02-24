@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dueño</title></head>
+<body>
+
+<h1>Ventas</h1>
+<button onclick="exportar()">Exportar Excel</button>
+<canvas id="grafico"></canvas>
+<div id="stats"></div>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import Chart from "https://cdn.jsdelivr.net/npm/chart.js";
+import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js";
+
+let datos = [];
+
+async function cargar() {
+  const snap = await getDocs(collection(db, "pedidos"));
+
+  let hoy = 0;
+  let semana = 0;
+  let mes = 0;
+  const dias = {};
+
+  datos = [];
+
+  snap.forEach(doc => {
+    const p = doc.data();
+    if (p.estado !== "entregado" || !p.createdAt) return;
+
+    const fecha = p.createdAt.toDate();
+    const total = p.items.reduce((a, b) => a + b.precio, 0);
+
+    datos.push({ fecha: fecha.toLocaleDateString(), mesa: p.mesa, total });
+
+    dias[fecha.toLocaleDateString()] = (dias[fecha.toLocaleDateString()] || 0) + total;
+
+    const diff = (new Date() - fecha) / (1000 * 60 * 60 * 24);
+    if (diff <= 1) hoy += total;
+    if (diff <= 7) semana += total;
+    if (diff <= 30) mes += total;
+  });
+
+  document.getElementById("stats").innerHTML = `
+    <div>Hoy: $${hoy}</div>
+    <div>Semana: $${semana}</div>
+    <div>Mes: $${mes}</div>
+  `;
+
+  new Chart(document.getElementById("grafico"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(dias),
+      datasets: [{ data: Object.values(dias) }]
+    }
+  });
+}
+
+window.exportar = function() {
+  const ws = XLSX.utils.json_to_sheet(datos);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Ventas");
+  XLSX.writeFile(wb, "ventas.xlsx");
+};
+
+cargar();
+</script>
+
+</body>
+</html>

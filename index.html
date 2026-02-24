@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>TOTO BAR</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="banner">
+  <img src="icon.png" class="logo-img" alt="logo">
+</div>
+
+<div class="paneles">
+  <button onclick="ir('cliente')">Cliente</button>
+  <button onclick="ir('mozo')">Mozo</button>
+  <button onclick="ir('cocina')">Cocina</button>
+  <button onclick="ir('admin')">Admin</button>
+  <button onclick="ir('dueno')">Dueño</button>
+</div>
+
+<script>
+function ir(rol) {
+  if (rol === "cliente") location.href = "cliente.html";
+  if (rol === "mozo") location.href = "mozo.html";
+  if (rol === "cocina") location.href = "cocina.html";
+  if (rol === "admin") location.href = "admin.html";
+  if (rol === "dueno") location.href = "dueno.html";
+}
+</script>
+
+</body>
+</html>

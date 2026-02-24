@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>Admin</title></head>
+<body>
+
+<h1>Admin</h1>
+
+<h2>Crear sección</h2>
+<input id="cat" placeholder="Nombre">
+<button onclick="crear()">Crear</button>
+
+<h2>Agregar producto</h2>
+<input id="prod" placeholder="Producto">
+<input id="precio" type="number" placeholder="Precio">
+<input id="categoria" placeholder="Sección">
+<button onclick="agregar()">Agregar</button>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { addDoc, collection } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+window.crear = async function() {
+  const nombre = document.getElementById("cat").value;
+  await addDoc(collection(db, "categorias"), { nombre });
+};
+
+window.agregar = async function() {
+  await addDoc(collection(db, "productos"), {
+    nombre: document.getElementById("prod").value,
+    precio: Number(document.getElementById("precio").value),
+    categoria: document.getElementById("categoria").value
+  });
+};
+</script>
+
+</body>
+</html>
